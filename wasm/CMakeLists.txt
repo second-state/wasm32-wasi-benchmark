@@ -38,3 +38,7 @@ target_compile_options(nbody-cpp.wasm PUBLIC -fno-exceptions)
 add_executable(mandelbrot-c.wasm
   ../src/mandelbrot.c
 )
+
+add_executable(binary-trees-c.wasm
+  ../src/binary-trees.c
+)

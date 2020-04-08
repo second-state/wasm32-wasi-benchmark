@@ -17,3 +17,7 @@ target_compile_options(nbody-cpp PUBLIC -fno-exceptions)
 add_executable(mandelbrot-c
   ../src/mandelbrot.c
 )
+
+add_executable(binary-trees-c
+  ../src/binary-trees.c
+)
