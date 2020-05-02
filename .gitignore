@@ -1,1 +1,3 @@
-build
+benchmark/
+build/
+thirdparty/
