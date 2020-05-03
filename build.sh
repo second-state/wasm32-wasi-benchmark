@@ -96,6 +96,15 @@ function invoke_cmake() {
     cmake --build build
 }
 
+function sed_wasm_module() {
+    for i in build/wasm/*.wasm; do
+        wasm-dis "$i" -o "$i".wat
+        sed -i -e 's@"env" "__wasi_@"wasi_snapshot_preview1" "@' "$i".wat
+        wasm-as "$i".wat -g -o "$i"
+        rm "$i".wat
+    done
+}
+
 check_cmake
 check_clang
 check_git
@@ -107,3 +116,4 @@ prepare_wavm
 
 apply_emcc
 invoke_cmake
+sed_wasm_module

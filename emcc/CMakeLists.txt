@@ -13,6 +13,14 @@ function(add_emcc_executable name)
   )
 endfunction()
 
+add_emcc_executable(nop.wasm
+  ../src/nop.c
+)
+
+add_emcc_executable(cat-sync.wasm
+  ../src/cat-sync.c
+)
+
 add_emcc_executable(fannkuch-redux-c.wasm
   ../src/fannkuch-redux.c
 )

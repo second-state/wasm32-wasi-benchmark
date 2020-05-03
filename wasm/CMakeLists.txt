@@ -21,6 +21,14 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
+add_executable(nop.wasm
+  ../src/nop.c
+)
+
+add_executable(cat-sync.wasm
+  ../src/cat-sync.c
+)
+
 add_executable(fannkuch-redux-c.wasm
   ../src/fannkuch-redux.c
 )

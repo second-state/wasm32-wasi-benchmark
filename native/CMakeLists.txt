@@ -1,5 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
+add_executable(nop
+  ../src/nop.c
+)
+
+add_executable(cat-sync
+  ../src/cat-sync.c
+)
 add_executable(fannkuch-redux-c
   ../src/fannkuch-redux.c
 )
