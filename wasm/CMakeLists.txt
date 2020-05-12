@@ -46,7 +46,33 @@ target_compile_options(nbody-cpp.wasm PUBLIC -fno-exceptions)
 add_executable(mandelbrot-c.wasm
   ../src/mandelbrot.c
 )
+target_link_options(
+  mandelbrot-c.wasm
+  PRIVATE
+  "SHELL:-z stack-size=262144"
+)
 
 add_executable(binary-trees-c.wasm
   ../src/binary-trees.c
+)
+target_link_options(
+  binary-trees-c.wasm
+  PRIVATE
+  "SHELL:-z stack-size=131072"
+)
+
+add_executable(f32.wasm
+  ../spec/f32.c
+)
+
+add_executable(f64.wasm
+  ../spec/f64.c
+)
+
+add_executable(i32.wasm
+  ../spec/i32.c
+)
+
+add_executable(i64.wasm
+  ../spec/i64.c
 )

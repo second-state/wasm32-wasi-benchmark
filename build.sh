@@ -105,6 +105,20 @@ function sed_wasm_module() {
     done
 }
 
+function build_dockers() {
+    for i in build/native/*; do
+        if [ -f "$i" -a -x "$i" ]; then
+            local NAME=$(basename "$i")
+            docker rmi "wasm-benchmark/$NAME"
+            cp "$i" "docker/$NAME"
+            pushd docker/
+            docker build --build-arg "NAME=$NAME" -t "wasm-benchmark/$NAME" .
+            popd
+            rm "docker/$NAME"
+        fi
+    done
+}
+
 check_cmake
 check_clang
 check_git
@@ -117,3 +131,4 @@ prepare_wavm
 apply_emcc
 invoke_cmake
 sed_wasm_module
+build_dockers

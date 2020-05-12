@@ -40,3 +40,19 @@ add_emcc_executable(mandelbrot-c.wasm
 add_emcc_executable(binary-trees-c.wasm
   ../src/binary-trees.c
 )
+
+add_emcc_executable(f32.wasm
+  ../spec/f32.c
+)
+
+add_emcc_executable(f64.wasm
+  ../spec/f64.c
+)
+
+add_emcc_executable(i32.wasm
+  ../spec/i32.c
+)
+
+add_emcc_executable(i64.wasm
+  ../spec/i64.c
+)

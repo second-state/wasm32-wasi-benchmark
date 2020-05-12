@@ -1,7 +1,10 @@
 #define _DEFAULT_SOURCE
+#include <errno.h>
 #include <fcntl.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -25,10 +28,12 @@ static bool simple_cat(char *const buf, size_t bufsize) {
 int main(int argc, char *argv[]) {
   struct stat stat_buf;
   if (fstat(STDOUT_FILENO, &stat_buf) != 0) {
+    fputs(strerror(errno), stderr);
     return EXIT_FAILURE;
   }
   const size_t outsize = MAX(128 * 1024, stat_buf.st_blksize);
   if (fstat(STDIN_FILENO, &stat_buf) != 0) {
+    fputs(strerror(errno), stderr);
     return EXIT_FAILURE;
   }
   const size_t insize = MAX(128 * 1024, stat_buf.st_blksize);
@@ -38,6 +43,7 @@ int main(int argc, char *argv[]) {
   const size_t bufsize = MAX(insize, outsize);
   char *buf;
   if (posix_memalign((void **)&buf, page_size, bufsize) != 0) {
+    fputs(strerror(errno), stderr);
     return EXIT_FAILURE;
   }
 

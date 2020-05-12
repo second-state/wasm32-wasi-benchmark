@@ -14,17 +14,5 @@ const importObject = { wasi_snapshot_preview1: wasi.wasiImport };
   const wasm = await WebAssembly.compile(fs.readFileSync(process.argv[2]));
   const instance = await WebAssembly.instantiate(wasm, importObject);
 
-  const start = process.hrtime();
   wasi.start(instance);
-  let diff = process.hrtime(start);
-  let str = ("00" + (diff[0] % 60).toString()).slice(-2) + "." + ("000000000" + diff[1].toString()).slice(-9);
-  diff[0] = diff[0] / 60 >> 0;
-  if (diff[0] >= 0) {
-    str = ("00" + (diff[0] % 60).toString()).slice(-2) + ":" + str;
-    diff[0] = diff[0] / 60 >> 0;
-    if (diff[0] >= 0) {
-      str = diff[0].toString() + ":" + str;
-    }
-  }
-  console.warn(`Runtime: ${str}`);
 })();

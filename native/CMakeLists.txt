@@ -28,3 +28,18 @@ add_executable(mandelbrot-c
 add_executable(binary-trees-c
   ../src/binary-trees.c
 )
+
+add_executable(f32
+  ../spec/f32.c
+)
+target_link_libraries(f32 PUBLIC m)
+add_executable(f64
+  ../spec/f64.c
+)
+target_link_libraries(f64 PUBLIC m)
+add_executable(i32
+  ../spec/i32.c
+)
+add_executable(i64
+  ../spec/i64.c
+)

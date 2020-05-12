@@ -7,7 +7,8 @@
 #include <stdlib.h>
 
 int main(int argc, char **argv) {
-  const uint64_t image_Width_And_Height = (atoi(argv[1]) + 7) / 8 * 8;
+  const uint64_t image_Width_And_Height =
+      (__builtin_expect(atoi(argv[1]), 15000) + 7) / 8 * 8;
 
   uint8_t *const pixels =
       malloc(image_Width_And_Height * image_Width_And_Height / 8);

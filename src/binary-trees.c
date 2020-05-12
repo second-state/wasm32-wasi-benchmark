@@ -12,7 +12,7 @@ static tree_node *create_Tree(const uint32_t tree_Depth) {
   if (root_Node == NULL) {
     printf("out of memory at %" PRIu32 ", memory:%" PRIu32 "\n", tree_Depth,
 #ifdef __wasm__
-           __builtin_wasm_memory_size(0)
+           (uint32_t)__builtin_wasm_memory_size(0)
 #else
            0
 #endif

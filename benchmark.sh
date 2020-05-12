@@ -26,7 +26,7 @@ ARGS=(
     50000000
     12
     15000
-    18
+    21
 )
 
 function prepare() {
@@ -35,12 +35,13 @@ function prepare() {
     mkdir -p benchmark/lucet
     mkdir -p benchmark/wavm
     mkdir -p benchmark/v8
+    mkdir -p benchmark/docker
     mkdir -p $WAVM_OBJECT_CACHE_DIR
     dd if=/dev/urandom of=benchmark/random bs=4k count=4k
 }
 
 function compile() {
-    for ((i=0; i<5; ++i)); do
+    for ((i=0; i<"${#NAME[@]}"; ++i)); do
         "$SSVMC" build/"$MODE"/"${NAME[i]}".wasm benchmark/ssvm/"${NAME[i]}".so
         "$LUCETC" build/"$MODE"/"${NAME[i]}".wasm --wasi_exe --opt-level speed --bindings "$LUCET_BINDINGS" -o benchmark/lucet/"${NAME[i]}".so
         "$WAVM" compile --format=precompiled-wasm build/"$MODE"/"${NAME[i]}".wasm benchmark/wavm/"${NAME[i]}".wasm
@@ -48,7 +49,7 @@ function compile() {
 }
 
 function benchmark_native() {
-    for ((i=0; i<5; ++i)); do
+    for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="benchmark/native/"${NAME[i]}".log"
         rm -f "$LOG"
         touch "$LOG"
@@ -59,7 +60,7 @@ function benchmark_native() {
 }
 
 function benchmark_ssvm() {
-    for ((i=0; i<5; ++i)); do
+    for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="benchmark/ssvm/"${NAME[i]}".log"
         rm -f "$LOG"
         touch "$LOG"
@@ -70,7 +71,7 @@ function benchmark_ssvm() {
 }
 
 function benchmark_lucet() {
-    for ((i=0; i<5; ++i)); do
+    for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="benchmark/lucet/"${NAME[i]}".log"
         rm -f "$LOG"
         touch "$LOG"
@@ -81,7 +82,7 @@ function benchmark_lucet() {
 }
 
 function benchmark_wavm() {
-    for ((i=0; i<5; ++i)); do
+    for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="benchmark/wavm/"${NAME[i]}".log"
         rm -f "$LOG"
         touch "$LOG"
@@ -92,7 +93,7 @@ function benchmark_wavm() {
 }
 
 function benchmark_v8() {
-    for ((i=0; i<5; ++i)); do
+    for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="benchmark/v8/"${NAME[i]}".log"
         rm -f "$LOG"
         touch "$LOG"
@@ -102,12 +103,23 @@ function benchmark_v8() {
     done
 }
 
+function benchmark_docker() {
+    for ((i=0; i<"${#NAME[@]}"; ++i)); do
+        LOG="benchmark/docker/"${NAME[i]}".log"
+        rm -f "$LOG"
+        touch "$LOG"
+        for ((j=0; j<10; ++j)); do
+            time docker run --rm -a stdin -a stdout -a stderr wasm-benchmark/"${NAME[i]}" /root/"${NAME[i]}" "${ARGS[i]}" <benchmark/random >&/dev/null
+        done 2> "$LOG"
+    done
+}
+
 function print_result() {
     for name in "${NAME[@]}"; do
         echo -n ,"$name"
     done
     echo
-    for type in native ssvm lucet wavm v8; do
+    for type in native ssvm lucet wavm v8 docker; do
         echo -n "$type"
         for name in "${NAME[@]}"; do
             echo -n ,"$(awk '{total+=$0;++count}END{print total/count}' benchmark/"$type"/"$name".log)"
@@ -116,11 +128,12 @@ function print_result() {
     done
 }
 
-#prepare
-#compile
-#benchmark_native
-#benchmark_ssvm
-#benchmark_lucet
-#benchmark_wavm
-#benchmark_v8
+prepare
+compile
+benchmark_native
+benchmark_ssvm
+benchmark_lucet
+benchmark_wavm
+benchmark_v8
+benchmark_docker
 print_result
