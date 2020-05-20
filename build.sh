@@ -109,7 +109,7 @@ function build_dockers() {
     for i in build/native/*; do
         if [ -f "$i" -a -x "$i" ]; then
             local NAME=$(basename "$i")
-            docker rmi "wasm-benchmark/$NAME"
+            docker rmi "wasm-benchmark/$NAME" || true
             cp "$i" "docker/$NAME"
             pushd docker/
             docker build --build-arg "NAME=$NAME" -t "wasm-benchmark/$NAME" .

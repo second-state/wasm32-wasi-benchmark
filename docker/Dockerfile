@@ -1,0 +1,5 @@
+FROM ubuntu:18.04
+ARG NAME
+ENV NAME $NAME
+WORKDIR /root
+ADD $NAME /root/
