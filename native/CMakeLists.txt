@@ -43,3 +43,12 @@ add_executable(i32
 add_executable(i64
   ../spec/i64.c
 )
+
+add_executable(clock
+  ../spec/clock.c
+)
+target_link_libraries(clock PUBLIC rt)
+
+add_executable(fd
+  ../spec/fd.c
+)

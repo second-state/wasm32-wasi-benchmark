@@ -1,3 +1,39 @@
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+#ifndef _LIBCPP_CONFIG_SITE
+#define _LIBCPP_CONFIG_SITE
+
+/* #undef _LIBCPP_ABI_VERSION */
+/* #undef _LIBCPP_ABI_UNSTABLE */
+/* #undef _LIBCPP_ABI_FORCE_ITANIUM */
+/* #undef _LIBCPP_ABI_FORCE_MICROSOFT */
+/* #undef _LIBCPP_HIDE_FROM_ABI_PER_TU_BY_DEFAULT */
+/* #undef _LIBCPP_HAS_NO_GLOBAL_FILESYSTEM_NAMESPACE */
+/* #undef _LIBCPP_HAS_NO_STDIN */
+/* #undef _LIBCPP_HAS_NO_STDOUT */
+#define _LIBCPP_HAS_NO_THREADS
+/* #undef _LIBCPP_HAS_NO_MONOTONIC_CLOCK */
+/* #undef _LIBCPP_HAS_NO_THREAD_UNSAFE_C_FUNCTIONS */
+/* #undef _LIBCPP_HAS_MUSL_LIBC */
+/* #undef _LIBCPP_HAS_THREAD_API_PTHREAD */
+/* #undef _LIBCPP_HAS_THREAD_API_EXTERNAL */
+/* #undef _LIBCPP_HAS_THREAD_API_WIN32 */
+/* #undef _LIBCPP_HAS_THREAD_LIBRARY_EXTERNAL */
+/* #undef _LIBCPP_DISABLE_VISIBILITY_ANNOTATIONS */
+/* #undef _LIBCPP_NO_VCRUNTIME */
+#define _LIBCPP_HAS_MERGED_TYPEINFO_NAMES_DEFAULT 0
+/* #undef _LIBCPP_ABI_NAMESPACE */
+/* #undef _LIBCPP_HAS_PARALLEL_ALGORITHMS */
+
+
+
+#endif // _LIBCPP_CONFIG_SITE
 // -*- C++ -*-
 //===--------------------------- __config ---------------------------------===//
 //
@@ -32,7 +68,7 @@
 #  define _GNUC_VER_NEW 0
 #endif
 
-#define _LIBCPP_VERSION 11000
+#define _LIBCPP_VERSION 10000
 
 #ifndef _LIBCPP_ABI_VERSION
 #  define _LIBCPP_ABI_VERSION 1
@@ -102,9 +138,6 @@
 #  define _LIBCPP_ABI_OPTIMIZED_FUNCTION
 // All the regex constants must be distinct and nonzero.
 #  define _LIBCPP_ABI_REGEX_CONSTANTS_NONZERO
-// Re-worked external template instantiations for std::string with a focus on
-// performance and fast-path inlining.
-#  define _LIBCPP_ABI_STRING_OPTIMIZED_EXTERNAL_INSTANTIATION
 #elif _LIBCPP_ABI_VERSION == 1
 #  if !defined(_LIBCPP_OBJECT_FORMAT_COFF)
 // Enable compiling copies of now inline methods into the dylib to support
@@ -470,10 +503,6 @@ typedef __char32_t char32_t;
 #define _LIBCPP_HAS_OBJC_ARC_WEAK
 #endif
 
-#if __has_extension(blocks)
-#  define _LIBCPP_HAS_EXTENSION_BLOCKS
-#endif
-
 #if !(__has_feature(cxx_relaxed_constexpr))
 #define _LIBCPP_HAS_NO_CXX14_CONSTEXPR
 #endif
@@ -497,10 +526,6 @@ typedef __char32_t char32_t;
 
 #if __has_builtin(__builtin_launder)
 #define _LIBCPP_COMPILER_HAS_BUILTIN_LAUNDER
-#endif
-
-#if __has_builtin(__builtin_constant_p)
-#define _LIBCPP_COMPILER_HAS_BUILTIN_CONSTANT_P
 #endif
 
 #if !__is_identifier(__has_unique_object_representations)
@@ -544,7 +569,9 @@ typedef __char32_t char32_t;
 
 #if _GNUC_VER >= 700
 #define _LIBCPP_COMPILER_HAS_BUILTIN_LAUNDER
-#define _LIBCPP_COMPILER_HAS_BUILTIN_CONSTANT_P
+#endif
+
+#if _GNUC_VER >= 700
 #define _LIBCPP_HAS_UNIQUE_OBJECT_REPRESENTATIONS
 #endif
 
@@ -910,10 +937,6 @@ typedef unsigned int   char32_t;
 #define _LIBCPP_EXTERN_TEMPLATE2(...) extern template __VA_ARGS__;
 #endif
 
-#ifndef _LIBCPP_EXTERN_TEMPLATE_DEFINE
-#define _LIBCPP_EXTERN_TEMPLATE_DEFINE(...) template __VA_ARGS__;
-#endif
-
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(_LIBCPP_MSVCRT_LIKE) || \
     defined(__sun__) || defined(__NetBSD__) || defined(__CloudABI__)
 #define _LIBCPP_LOCALE__L_EXTENSIONS 1
@@ -1138,8 +1161,7 @@ _LIBCPP_FUNC_VIS extern "C" void __sanitizer_annotate_contiguous_container(
       (defined(__MINGW32__) && __has_include(<pthread.h>))
 #    define _LIBCPP_HAS_THREAD_API_PTHREAD
 #  elif defined(__Fuchsia__)
-     // TODO(44575): Switch to C11 thread API when possible.
-#    define _LIBCPP_HAS_THREAD_API_PTHREAD
+#    define _LIBCPP_HAS_THREAD_API_C11
 #  elif defined(_LIBCPP_WIN32API)
 #    define _LIBCPP_HAS_THREAD_API_WIN32
 #  else
@@ -1435,10 +1457,6 @@ _LIBCPP_FUNC_VIS extern "C" void __sanitizer_annotate_contiguous_container(
      _Pragma("clang attribute pop")                                            \
      _Pragma("clang attribute pop")                                            \
      _Pragma("clang attribute pop")
-#  define _LIBCPP_AVAILABILITY_TO_CHARS                                        \
-     _LIBCPP_AVAILABILITY_FILESYSTEM
-#  define _LIBCPP_AVAILABILITY_SYNC                                            \
-     /*FIXME:mark this as unavailable on Apple platforms*/
 #else
 #  define _LIBCPP_AVAILABILITY_SHARED_MUTEX
 #  define _LIBCPP_AVAILABILITY_BAD_VARIANT_ACCESS
@@ -1453,8 +1471,6 @@ _LIBCPP_FUNC_VIS extern "C" void __sanitizer_annotate_contiguous_container(
 #  define _LIBCPP_AVAILABILITY_FILESYSTEM
 #  define _LIBCPP_AVAILABILITY_FILESYSTEM_PUSH
 #  define _LIBCPP_AVAILABILITY_FILESYSTEM_POP
-#  define _LIBCPP_AVAILABILITY_TO_CHARS
-#  define _LIBCPP_AVAILABILITY_SYNC
 #endif
 
 // Define availability that depends on _LIBCPP_NO_EXCEPTIONS.
@@ -1538,29 +1554,6 @@ _LIBCPP_FUNC_VIS extern "C" void __sanitizer_annotate_contiguous_container(
 #  define _LIBCPP_FOPEN_CLOEXEC_MODE
 #endif
 
-#ifdef _LIBCPP_COMPILER_HAS_BUILTIN_CONSTANT_P
-#define _LIBCPP_BUILTIN_CONSTANT_P(x) __builtin_constant_p(x)
-#else
-#define _LIBCPP_BUILTIN_CONSTANT_P(x) false
-#endif
-
 #endif // __cplusplus
 
 #endif // _LIBCPP_CONFIG
-//===----------------------------------------------------------------------===//
-//
-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-//
-//===----------------------------------------------------------------------===//
-
-#ifndef _LIBCPP_CONFIG_SITE
-#define _LIBCPP_CONFIG_SITE
-
-#define _LIBCPP_ABI_VERSION 1
-#define _LIBCPP_HAS_NO_THREADS
-#define _LIBCPP_HAS_NO_ATOMIC_HEADER
-#define _LIBCPP_HAS_MUSL_LIBC
-
-#endif // _LIBCPP_CONFIG_SITE

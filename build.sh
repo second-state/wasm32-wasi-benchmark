@@ -10,12 +10,12 @@ function check_cmake() {
 }
 
 function check_clang() {
-    if ! clang-9 --version >/dev/null; then
-        echo "clang-9 required!"
+    if ! clang-10 --version >/dev/null; then
+        echo "clang-10 required!"
         exit 1
     fi
-    if ! clang++-9 --version >/dev/null; then
-        echo "clang++-9 required!"
+    if ! clang++-10 --version >/dev/null; then
+        echo "clang++-10 required!"
         exit 1
     fi
 }
@@ -92,7 +92,7 @@ function apply_emcc() {
 }
 
 function invoke_cmake() {
-    CC=clang-9 CXX=clang++-9 cmake -B build . -DCMAKE_BUILD_TYPE=Release
+    CC=clang-10 CXX=clang++-10 cmake -B build . -DCMAKE_BUILD_TYPE=Release
     cmake --build build
 }
 
@@ -102,6 +102,13 @@ function sed_wasm_module() {
         sed -i -e 's@"env" "__wasi_@"wasi_snapshot_preview1" "@' "$i".wat
         wasm-as "$i".wat -g -o "$i"
         rm "$i".wat
+    done
+}
+
+function run_wasm_opt() {
+    for i in build/wasm/*.wasm; do
+        mv "$i" "$i".orig.wasm
+        wasm-opt -g -O3 "$i".orig.wasm -o "$i"
     done
 }
 
@@ -131,4 +138,5 @@ prepare_wavm
 apply_emcc
 invoke_cmake
 sed_wasm_module
+run_wasm_opt
 build_dockers

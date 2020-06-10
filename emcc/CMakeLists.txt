@@ -56,3 +56,11 @@ add_emcc_executable(i32.wasm
 add_emcc_executable(i64.wasm
   ../spec/i64.c
 )
+
+add_emcc_executable(clock.wasm
+  ../spec/clock.c
+)
+
+add_emcc_executable(fd.wasm
+  ../spec/fd.c
+)

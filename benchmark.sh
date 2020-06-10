@@ -49,6 +49,7 @@ function compile() {
 }
 
 function benchmark_native() {
+    echo benchmark_native
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="benchmark/native/"${NAME[i]}".log"
         rm -f "$LOG"
@@ -60,6 +61,7 @@ function benchmark_native() {
 }
 
 function benchmark_ssvm() {
+    echo benchmark_ssvm
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="benchmark/ssvm/"${NAME[i]}".log"
         rm -f "$LOG"
@@ -71,6 +73,7 @@ function benchmark_ssvm() {
 }
 
 function benchmark_lucet() {
+    echo benchmark_lucet
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="benchmark/lucet/"${NAME[i]}".log"
         rm -f "$LOG"
@@ -82,6 +85,7 @@ function benchmark_lucet() {
 }
 
 function benchmark_wavm() {
+    echo benchmark_wavm
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="benchmark/wavm/"${NAME[i]}".log"
         rm -f "$LOG"
@@ -93,6 +97,7 @@ function benchmark_wavm() {
 }
 
 function benchmark_v8() {
+    echo benchmark_v8
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="benchmark/v8/"${NAME[i]}".log"
         rm -f "$LOG"
@@ -104,6 +109,7 @@ function benchmark_v8() {
 }
 
 function benchmark_docker() {
+    echo benchmark_docker
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="benchmark/docker/"${NAME[i]}".log"
         rm -f "$LOG"
@@ -120,6 +126,7 @@ function print_result() {
     done
     echo
     for type in native ssvm lucet wavm v8 docker; do
+    #for type in ssvm; do
         echo -n "$type"
         for name in "${NAME[@]}"; do
             echo -n ,"$(awk '{total+=$0;++count}END{print total/count}' benchmark/"$type"/"$name".log)"

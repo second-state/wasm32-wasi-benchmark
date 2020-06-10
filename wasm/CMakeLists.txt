@@ -12,7 +12,7 @@ add_link_options(
   --sysroot=${CMAKE_CURRENT_SOURCE_DIR}/sysroot
   -fno-exceptions
   -resource-dir ${CMAKE_CURRENT_SOURCE_DIR}/sysroot
-  -fuse-ld=/usr/bin/wasm-ld-9
+  -fuse-ld=/usr/bin/wasm-ld-10
   -Wl,--allow-undefined-file=${CMAKE_CURRENT_SOURCE_DIR}/sysroot/share/wasm32-wasi/undefined-symbols.txt
 )
 
@@ -75,4 +75,12 @@ add_executable(i32.wasm
 
 add_executable(i64.wasm
   ../spec/i64.c
+)
+
+add_executable(clock.wasm
+  ../spec/clock.c
+)
+
+add_executable(fd.wasm
+  ../spec/fd.c
 )

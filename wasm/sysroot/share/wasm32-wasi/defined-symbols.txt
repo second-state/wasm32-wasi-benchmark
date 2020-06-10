@@ -1015,6 +1015,7 @@ unlinkat
 unsetenv
 uselocale
 usleep
+utime
 utimensat
 vasprintf
 vdprintf

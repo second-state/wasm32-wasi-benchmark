@@ -15,6 +15,8 @@ NAME=(
     f64
     i32
     i64
+    clock
+    fd
 )
 
 function prepare() {
@@ -34,6 +36,7 @@ function compile() {
 }
 
 function test_ssvm() {
+    echo test_ssvm
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="test/ssvm/"${NAME[i]}".log"
         rm -f "$LOG"
@@ -42,6 +45,7 @@ function test_ssvm() {
 }
 
 function test_lucet() {
+    echo test_lucet
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="test/lucet/"${NAME[i]}".log"
         rm -f "$LOG"
@@ -50,6 +54,7 @@ function test_lucet() {
 }
 
 function test_wavm() {
+    echo test_wavm
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="test/wavm/"${NAME[i]}".log"
         rm -f "$LOG"
@@ -58,6 +63,7 @@ function test_wavm() {
 }
 
 function test_v8() {
+    echo test_v8
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
         LOG="test/v8/"${NAME[i]}".log"
         rm -f "$LOG"
