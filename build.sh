@@ -68,6 +68,27 @@ function prepare_lucet() {
     fi
 }
 
+function prepare_ssvm() {
+    if [ -e thirdparty/ssvm/.git ]; then
+        pushd thirdparty/ssvm
+        git fetch -a
+        git reset --hard origin/HEAD
+        git submodule update --init --recursive
+        make build
+        popd
+    else
+        git clone --depth 1 https://github.com/second-state/SSVM.git thirdparty/ssvm
+        pushd thirdparty/ssvm
+        git submodule update --init --recursive
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+        make
+        cd ..
+        popd
+    fi
+}
+
 function prepare_wavm() {
     if [ -e thirdparty/wavm/.git ]; then
         pushd thirdparty/wavm
@@ -134,6 +155,7 @@ check_rustup
 prepare_lucet
 prepare_emcc
 prepare_wavm
+prepare_ssvm
 
 apply_emcc
 invoke_cmake

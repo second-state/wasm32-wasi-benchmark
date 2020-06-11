@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 MODE=wasm
-SSVMC=~/workspace/ssvm/build/tools/ssvm-aot/ssvmc
-SSVMR=~/workspace/ssvm/build/tools/ssvm-aot/ssvmr
+SSVMC=thirdparty/ssvm/build/tools/ssvm-aot/ssvmc
+SSVMR=thirdparty/ssvm/build/tools/ssvm-aot/ssvmr
 LUCETC=thirdparty/lucet/target/release/lucetc
 LUCET_WASI=thirdparty/lucet/target/release/lucet-wasi
 LUCET_BINDINGS=thirdparty/lucet/lucet-wasi/bindings.json
