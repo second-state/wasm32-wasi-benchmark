@@ -6,11 +6,14 @@ all benchmarking C/C++ source are comming from [The Computer Langeuage Benchmark
 
 # Requirement
 
-* [Clang 9](https://clang.llvm.org/)
-* [LLD 9](https://lld.llvm.org/)
+Use the `configure.sh` to install the following dependencies for this benchmark.
+Or you can follow the installation intructions from these website to setup your working environment.
+
+* [Clang 10](https://clang.llvm.org/)
+* [LLD 10](https://lld.llvm.org/)
 * [emscripten](https://github.com/emscripten-core/emsdk)
 * [nodejs v14.3.0](https://nodejs.org/en/)
-* [docker v19.03.8](https://www.docker.com/)
+* [docker >v19.03.8](https://www.docker.com/)
 
 # Recent Benchmark Results
 
