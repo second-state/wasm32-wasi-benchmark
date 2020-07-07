@@ -128,8 +128,8 @@ function sed_wasm_module() {
 
 function run_wasm_opt() {
     for i in build/wasm/*.wasm; do
-        mv "$i" "$i".orig.wasm
-        wasm-opt -g -O3 "$i".orig.wasm -o "$i"
+        mv "$i" "$i".orig
+        wasm-opt -g -O3 "$i".orig -o "$i"
     done
 }
 
