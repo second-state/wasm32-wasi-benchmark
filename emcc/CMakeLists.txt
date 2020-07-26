@@ -7,7 +7,12 @@ function(add_emcc_executable name)
   endforeach()
 
   add_custom_target(emcc-${name} ALL
-    emcc -g -Oz --llvm-lto 1 -s STANDALONE_WASM -s INITIAL_MEMORY=32MB -s MAXIMUM_MEMORY=-1 ${listed} -o ${name}
+    emcc -g -Oz --llvm-lto 1 -s STANDALONE_WASM -s INITIAL_MEMORY=32MB -s MAXIMUM_MEMORY=4GB
+    -mmultivalue
+    -mmutable-globals
+    -mnontrapping-fptoint
+    -msign-ext
+    ${listed} -o ${name}
     BYPRODUCTS ${name}
     DEPENDS ${listed}
   )
@@ -39,6 +44,10 @@ add_emcc_executable(mandelbrot-c.wasm
 
 add_emcc_executable(binary-trees-c.wasm
   ../src/binary-trees.c
+)
+
+add_emcc_executable(fasta-c.wasm
+  ../src/fasta.c
 )
 
 add_emcc_executable(f32.wasm

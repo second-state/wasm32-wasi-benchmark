@@ -6,6 +6,10 @@ add_compile_options(
   --sysroot=${CMAKE_CURRENT_SOURCE_DIR}/sysroot
   -fno-exceptions
   -fno-rounding-math
+  -mmultivalue
+  -mmutable-globals
+  -mnontrapping-fptoint
+  -msign-ext
   )
 add_link_options(
   --target=wasm32-wasi
@@ -59,6 +63,15 @@ target_link_options(
   binary-trees-c.wasm
   PRIVATE
   "SHELL:-z stack-size=131072"
+)
+
+add_executable(fasta-c.wasm
+  ../src/fasta.c
+)
+target_link_options(
+  fasta-c.wasm
+  PRIVATE
+  "SHELL:-z stack-size=524288"
 )
 
 add_executable(f32.wasm

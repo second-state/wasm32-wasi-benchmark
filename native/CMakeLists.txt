@@ -29,6 +29,10 @@ add_executable(binary-trees-c
   ../src/binary-trees.c
 )
 
+add_executable(fasta-c
+  ../src/fasta.c
+)
+
 add_executable(f32
   ../spec/f32.c
 )

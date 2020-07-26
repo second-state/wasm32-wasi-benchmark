@@ -18,6 +18,7 @@ NAME=(
     fannkuch-redux-c
     mandelbrot-c
     binary-trees-c
+    fasta-c
 )
 ARGS=(
     0
@@ -27,6 +28,7 @@ ARGS=(
     12
     15000
     21
+    25000000
 )
 
 function prepare() {
