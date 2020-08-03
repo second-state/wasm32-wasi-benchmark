@@ -12,7 +12,6 @@ if (isMainThread) {
 }
 
 async function mainThread(size) {
-    console.time("mandelbrot");
     const bytesPerRow = size >> 3;
 
     const nextYSize = bytesPerFloat;
@@ -52,7 +51,6 @@ async function mainThread(size) {
             }
         });
     }
-    console.timeEnd("mandelbrot");
 }
 
 function workerThread({size, bytesPerRow}) {

@@ -147,7 +147,6 @@ function energy() {
     return e;
 }
 
-console.time("nbody");
 const n = +process.argv[2];
 
 offsetMomentum();
@@ -157,4 +156,3 @@ for (let i = 0; i < n; i++) {
     advance(0.01);
 }
 console.log(energy().toFixed(9));
-console.timeEnd("nbody");

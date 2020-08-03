@@ -124,7 +124,6 @@ if (isMainThread) {
 }
 
 async function mainThread(n) {
-    console.time("fannkuchredux");
     fillFact(n);
 
     const nchunks = 720;
@@ -150,7 +149,6 @@ async function mainThread(n) {
     });
 
     console.log(`${chk}\nPfannkuchen(${n}) = ${flips}`);
-    console.timeEnd("fannkuchredux");
 }
 
 function workerThread(n) {

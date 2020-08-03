@@ -71,7 +71,6 @@ function fastaRandom(n, table) {
   }
 }
 
-console.time("fasta");
 var n = +process.argv[2];
 
 // console.log(">ONE Homo sapiens alu")
@@ -82,4 +81,3 @@ fastaRandom(3*n, IUB)
 
 // console.log(">THREE Homo sapiens frequency")
 fastaRandom(5*n, HomoSap)
-console.timeEnd("fasta");
