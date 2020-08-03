@@ -40,6 +40,4 @@ function bottomUpTree(depth) {
         : new TreeNode(null, null);
 }
 
-console.time("binarytrees");
 mainThread();
-console.timeEnd("binarytrees");
