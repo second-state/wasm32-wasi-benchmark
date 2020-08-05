@@ -25,7 +25,7 @@ Performance
 ```
 $ time docker run --cpus="1.0" --rm -v $(pwd):/app -w /app -i -t nodejs-benchmark:v1 node nop.js
 $ time docker run --cpus="1.0" --rm -v $(pwd):/app -w /app -i -t nodejs-benchmark:v1 node cat-sync.js
-$ time docker run --cpus="1.0" --rm -v $(pwd):/app -w /app -i -t nodejs-benchmark:v1 node fannkuchredux.node-5.js 12
+$ time docker run --cpus="1.0" --rm -v $(pwd):/app -w /app -i -t nodejs-benchmark:v1 node fannkuchredux.node.js 12
 $ time docker run --cpus="1.0" --rm -v $(pwd):/app -w /app -i -t nodejs-benchmark:v1 node nbody.node-6.js 50000000
 $ time docker run --cpus="1.0" --rm -v $(pwd):/app -w /app -i -t nodejs-benchmark:v1 node binarytrees-node-7.js 21
 $ time docker run --cpus="1.0" --rm -v $(pwd):/app -w /app -i -t nodejs-benchmark:v1 node mandelbrot.node-3.js 15000

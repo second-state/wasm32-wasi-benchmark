@@ -31,8 +31,8 @@ async function mainThread(size) {
 
     await work();
 
-    // process.stdout.write(`P4\n${size} ${size}\n`);
-    // process.stdout.write(new Uint8Array(sab, rowsStart, rowsSize));
+    process.stdout.write(`P4\n${size} ${size}\n`);
+    process.stdout.write(new Uint8Array(sab, rowsStart, rowsSize));
 
     async function work() {
         return new Promise(resolve => {
