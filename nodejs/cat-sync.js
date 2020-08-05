@@ -1,2 +1,3 @@
 const fs = require('fs');
-fs.writeFileSync("tmp.txt", "0000000000000");
+var s = '#'.repeat(128*1024);
+fs.writeFileSync("tmp.txt", s);
