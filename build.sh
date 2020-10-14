@@ -34,6 +34,13 @@ function check_rustup() {
     fi
 }
 
+function check_wasmer() {
+    if ! wasmer --version>/dev/null; then
+        echo "wasmer required!"
+        exit 1
+    fi
+}
+
 function prepare_emcc() {
     if [ -e thirdparty/emsdk/.git ]; then
         pushd thirdparty/emsdk
@@ -153,6 +160,7 @@ check_cmake
 check_clang
 check_git
 check_rustup
+check_wasmer
 
 prepare_lucet
 prepare_emcc

@@ -8,9 +8,9 @@
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
-  DIR *dir = fdopendir(3);
+  DIR *dir = opendir(".");
   if (dir == NULL) {
-    printf("fdopendir failed: %s\n", strerror(errno));
+    printf("opendir failed: %s\n", strerror(errno));
     return EXIT_FAILURE;
   }
   for (struct dirent *dirent = readdir(dir); dirent != NULL;

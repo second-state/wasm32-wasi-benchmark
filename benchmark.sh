@@ -36,6 +36,10 @@ function prepare() {
     mkdir -p benchmark/ssvm
     mkdir -p benchmark/lucet
     mkdir -p benchmark/wavm
+    mkdir -p benchmark/wasmer_singlepass
+    mkdir -p benchmark/wasmer_cranelift
+    mkdir -p benchmark/wasmer_llvm
+    mkdir -p benchmark/wasmer_jit
     mkdir -p benchmark/v8
     mkdir -p benchmark/docker
     mkdir -p $WAVM_OBJECT_CACHE_DIR
@@ -43,10 +47,14 @@ function prepare() {
 }
 
 function compile() {
+    rm -f benchmark/ssvm/compile.time benchmark/lucet/compile.time benchmark/wavm/compile.time benchmark/wasmer_*/compile.time
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
-        "$SSVMC" build/"$MODE"/"${NAME[i]}".wasm benchmark/ssvm/"${NAME[i]}".so || true
-        "$LUCETC" build/"$MODE"/"${NAME[i]}".wasm --wasi_exe --opt-level speed --bindings "$LUCET_BINDINGS" -o benchmark/lucet/"${NAME[i]}".so || true
-        "$WAVM" compile --format=precompiled-wasm build/"$MODE"/"${NAME[i]}".wasm benchmark/wavm/"${NAME[i]}".wasm || true
+        (time "$SSVMC" build/"$MODE"/"${NAME[i]}".wasm benchmark/ssvm/"${NAME[i]}".so 2>&1) 2>> benchmark/ssvm/compile.time || true
+        (time "$LUCETC" build/"$MODE"/"${NAME[i]}".wasm --wasi_exe --opt-level speed --bindings "$LUCET_BINDINGS" -o benchmark/lucet/"${NAME[i]}".so 2>&1) 2>> benchmark/lucet/compile.time || true
+        (time "$WAVM" compile --format=precompiled-wasm build/"$MODE"/"${NAME[i]}".wasm benchmark/wavm/"${NAME[i]}".wasm 2>&1) 2>> benchmark/wavm/compile.time || true
+        (time wasmer compile --singlepass build/"$MODE"/"${NAME[i]}".wasm -o benchmark/wasmer_singlepass/"${NAME[i]}".wjit 2>&1) 2>> benchmark/wasmer_singlepass/compile.time || true
+        (time wasmer compile --cranelift build/"$MODE"/"${NAME[i]}".wasm -o benchmark/wasmer_cranelift/"${NAME[i]}".wjit 2>&1) 2>> benchmark/wasmer_cranelift/compile.time || true
+        (time wasmer compile --llvm build/"$MODE"/"${NAME[i]}".wasm -o benchmark/wasmer_llvm/"${NAME[i]}".wjit 2>&1) 2>> benchmark/wasmer_llvm/compile.time || true
     done
 }
 
@@ -59,6 +67,7 @@ function benchmark_native() {
         for ((j=0; j<10; ++j)); do
             time "build/native/${NAME[i]}" "${ARGS[i]}" <benchmark/random >&/dev/null
         done 2> "$LOG"
+        /usr/bin/time -o "benchmark/native/"${NAME[i]}".time" --verbose "build/native/${NAME[i]}" "${ARGS[i]}" <benchmark/random >&/dev/null
     done
 }
 
@@ -71,6 +80,7 @@ function benchmark_ssvm() {
         for ((j=0; j<10; ++j)); do
             time "$SSVMR" benchmark/ssvm/"${NAME[i]}".so "${ARGS[i]}" <benchmark/random >&/dev/null
         done 2> "$LOG"
+        /usr/bin/time -o "benchmark/ssvm/"${NAME[i]}".time" --verbose "$SSVMR" benchmark/ssvm/"${NAME[i]}".so "${ARGS[i]}" <benchmark/random >&/dev/null
     done
 }
 
@@ -83,6 +93,7 @@ function benchmark_lucet() {
         for ((j=0; j<10; ++j)); do
             time "$LUCET_WASI" benchmark/lucet/"${NAME[i]}".so "${ARGS[i]}" <benchmark/random >&/dev/null
         done 2> "$LOG"
+        /usr/bin/time -o "benchmark/lucet/"${NAME[i]}".time" --verbose "$LUCET_WASI" benchmark/lucet/"${NAME[i]}".so "${ARGS[i]}" <benchmark/random >&/dev/null
     done
 }
 
@@ -95,6 +106,59 @@ function benchmark_wavm() {
         for ((j=0; j<10; ++j)); do
             time "$WAVM" run --precompiled --abi=wasi benchmark/wavm/"${NAME[i]}".wasm "${ARGS[i]}" <benchmark/random >&/dev/null
         done 2> "$LOG"
+        /usr/bin/time -o "benchmark/wavm/"${NAME[i]}".time" --verbose "$WAVM" run --precompiled --abi=wasi benchmark/wavm/"${NAME[i]}".wasm "${ARGS[i]}" <benchmark/random >&/dev/null
+    done
+}
+
+function benchmark_wasmer_singlepass() {
+    echo benchmark_wasmer_singlepass
+    for ((i=0; i<"${#NAME[@]}"; ++i)); do
+        LOG="benchmark/wasmer_singlepass/"${NAME[i]}".log"
+        rm -f "$LOG"
+        touch "$LOG"
+        for ((j=0; j<10; ++j)); do
+            time wasmer run benchmark/wasmer_singlepass/"${NAME[i]}".wjit "${ARGS[i]}" <benchmark/random >&/dev/null
+        done 2> "$LOG"
+        /usr/bin/time -o "benchmark/wasmer_singlepass/"${NAME[i]}".time" --verbose wasmer run benchmark/wasmer_singlepass/"${NAME[i]}".wjit "${ARGS[i]}" <benchmark/random >&/dev/null
+    done
+}
+
+function benchmark_wasmer_cranelift() {
+    echo benchmark_wasmer_cranelift
+    for ((i=0; i<"${#NAME[@]}"; ++i)); do
+        LOG="benchmark/wasmer_cranelift/"${NAME[i]}".log"
+        rm -f "$LOG"
+        touch "$LOG"
+        for ((j=0; j<10; ++j)); do
+            time wasmer run benchmark/wasmer_cranelift/"${NAME[i]}".wjit "${ARGS[i]}" <benchmark/random >&/dev/null
+        done 2> "$LOG"
+        /usr/bin/time -o "benchmark/wasmer_cranelift/"${NAME[i]}".time" --verbose wasmer run benchmark/wasmer_cranelift/"${NAME[i]}".wjit "${ARGS[i]}" <benchmark/random >&/dev/null
+    done
+}
+
+function benchmark_wasmer_llvm() {
+    echo benchmark_wasmer_llvm
+    for ((i=0; i<"${#NAME[@]}"; ++i)); do
+        LOG="benchmark/wasmer_llvm/"${NAME[i]}".log"
+        rm -f "$LOG"
+        touch "$LOG"
+        for ((j=0; j<10; ++j)); do
+            time wasmer run benchmark/wasmer_llvm/"${NAME[i]}".wjit "${ARGS[i]}" <benchmark/random >&/dev/null
+        done 2> "$LOG"
+        /usr/bin/time -o "benchmark/wasmer_llvm/"${NAME[i]}".time" --verbose wasmer run benchmark/wasmer_llvm/"${NAME[i]}".wjit "${ARGS[i]}" <benchmark/random >&/dev/null
+    done
+}
+
+function benchmark_wasmer_jit() {
+    echo benchmark_wasmer_jit
+    for ((i=0; i<"${#NAME[@]}"; ++i)); do
+        LOG="benchmark/wasmer_jit/"${NAME[i]}".log"
+        rm -f "$LOG"
+        touch "$LOG"
+        for ((j=0; j<10; ++j)); do
+            time wasmer run --jit build/"$MODE"/"${NAME[i]}".wasm "${ARGS[i]}" <benchmark/random >&/dev/null
+        done 2> "$LOG"
+        /usr/bin/time -o "benchmark/wasmer_jit/"${NAME[i]}".time" --verbose wasmer run --jit build/"$MODE"/"${NAME[i]}".wasm "${ARGS[i]}" <benchmark/random >&/dev/null
     done
 }
 
@@ -107,6 +171,7 @@ function benchmark_v8() {
         for ((j=0; j<10; ++j)); do
             time nodejs --experimental-wasi-unstable-preview1 --experimental-wasm-bigint v8/index.js build/"$MODE"/"${NAME[i]}".wasm "${ARGS[i]}" <benchmark/random >&/dev/null
         done 2> "$LOG"
+        /usr/bin/time -o "benchmark/v8/"${NAME[i]}".time" --verbose nodejs --experimental-wasi-unstable-preview1 --experimental-wasm-bigint v8/index.js build/"$MODE"/"${NAME[i]}".wasm "${ARGS[i]}" <benchmark/random >&/dev/null
     done
 }
 
@@ -119,6 +184,7 @@ function benchmark_docker() {
         for ((j=0; j<10; ++j)); do
             time docker run --rm -a stdin -a stdout -a stderr wasm-benchmark/"${NAME[i]}" /root/"${NAME[i]}" "${ARGS[i]}" <benchmark/random >&/dev/null
         done 2> "$LOG"
+        /usr/bin/time -o "benchmark/docker/"${NAME[i]}".time" --verbose docker run --rm -a stdin -a stdout -a stderr wasm-benchmark/"${NAME[i]}" /root/"${NAME[i]}" "${ARGS[i]}" <benchmark/random >&/dev/null
     done
 }
 
@@ -127,7 +193,7 @@ function print_result() {
         echo -n ,"$name"
     done
     echo
-    for type in native ssvm lucet wavm v8 docker; do
+    for type in native ssvm lucet wavm wasmer_singlepass wasmer_cranelift wasmer_llvm wasmer_jit v8 docker; do
     #for type in ssvm; do
         echo -n "$type"
         for name in "${NAME[@]}"; do
@@ -143,6 +209,10 @@ benchmark_native
 benchmark_ssvm
 benchmark_lucet
 benchmark_wavm
+benchmark_wasmer_singlepass
+benchmark_wasmer_cranelift
+benchmark_wasmer_llvm
+benchmark_wasmer_jit
 benchmark_v8
 benchmark_docker
 print_result
