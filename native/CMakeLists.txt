@@ -25,6 +25,10 @@ add_executable(mandelbrot-c
   ../src/mandelbrot.c
 )
 
+add_executable(mandelbrot-simd-c
+  ../src/mandelbrot-simd.c
+)
+
 add_executable(binary-trees-c
   ../src/binary-trees.c
 )

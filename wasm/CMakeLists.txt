@@ -6,7 +6,7 @@ add_compile_options(
   --sysroot=${CMAKE_CURRENT_SOURCE_DIR}/sysroot
   -fno-exceptions
   -fno-rounding-math
-  -mmultivalue
+  -ftls-model=local-exec
   -mmutable-globals
   -mnontrapping-fptoint
   -msign-ext
@@ -16,7 +16,7 @@ add_link_options(
   --sysroot=${CMAKE_CURRENT_SOURCE_DIR}/sysroot
   -fno-exceptions
   -resource-dir ${CMAKE_CURRENT_SOURCE_DIR}/sysroot
-  -fuse-ld=/usr/bin/wasm-ld-10
+  -fuse-ld=/usr/bin/wasm-ld-11
   -Wl,--allow-undefined-file=${CMAKE_CURRENT_SOURCE_DIR}/sysroot/share/wasm32-wasi/undefined-symbols.txt
 )
 
@@ -52,6 +52,20 @@ add_executable(mandelbrot-c.wasm
 )
 target_link_options(
   mandelbrot-c.wasm
+  PRIVATE
+  "SHELL:-z stack-size=262144"
+)
+
+add_executable(mandelbrot-simd-c.wasm
+  ../src/mandelbrot-simd.c
+)
+target_compile_options(
+  mandelbrot-simd-c.wasm
+  PRIVATE
+  -msimd128
+)
+target_link_options(
+  mandelbrot-simd-c.wasm
   PRIVATE
   "SHELL:-z stack-size=262144"
 )

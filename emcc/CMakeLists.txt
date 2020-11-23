@@ -8,7 +8,6 @@ function(add_emcc_executable name)
 
   add_custom_target(emcc-${name} ALL
     emcc -g -Oz --llvm-lto 1 -s STANDALONE_WASM -s INITIAL_MEMORY=32MB -s MAXIMUM_MEMORY=4GB
-    -mmultivalue
     -mmutable-globals
     -mnontrapping-fptoint
     -msign-ext
@@ -40,6 +39,10 @@ add_emcc_executable(nbody-cpp.wasm
 
 add_emcc_executable(mandelbrot-c.wasm
   ../src/mandelbrot.c
+)
+
+add_emcc_executable(mandelbrot-simd-c.wasm
+  ../src/mandelbrot-simd.c
 )
 
 add_emcc_executable(binary-trees-c.wasm

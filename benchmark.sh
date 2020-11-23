@@ -17,6 +17,7 @@ NAME=(
     nbody-cpp
     fannkuch-redux-c
     mandelbrot-c
+    mandelbrot-simd-c
     binary-trees-c
     fasta-c
 )
@@ -26,6 +27,7 @@ ARGS=(
     50000000
     50000000
     12
+    15000
     15000
     21
     25000000
@@ -51,10 +53,10 @@ function compile() {
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
         (time "$SSVMC" build/"$MODE"/"${NAME[i]}".wasm benchmark/ssvm/"${NAME[i]}".so 2>&1) 2>> benchmark/ssvm/compile.time || true
         (time "$LUCETC" build/"$MODE"/"${NAME[i]}".wasm --wasi_exe --opt-level speed --bindings "$LUCET_BINDINGS" -o benchmark/lucet/"${NAME[i]}".so 2>&1) 2>> benchmark/lucet/compile.time || true
-        (time "$WAVM" compile --format=precompiled-wasm build/"$MODE"/"${NAME[i]}".wasm benchmark/wavm/"${NAME[i]}".wasm 2>&1) 2>> benchmark/wavm/compile.time || true
-        (time wasmer compile --singlepass build/"$MODE"/"${NAME[i]}".wasm -o benchmark/wasmer_singlepass/"${NAME[i]}".wjit 2>&1) 2>> benchmark/wasmer_singlepass/compile.time || true
-        (time wasmer compile --cranelift build/"$MODE"/"${NAME[i]}".wasm -o benchmark/wasmer_cranelift/"${NAME[i]}".wjit 2>&1) 2>> benchmark/wasmer_cranelift/compile.time || true
-        (time wasmer compile --llvm build/"$MODE"/"${NAME[i]}".wasm -o benchmark/wasmer_llvm/"${NAME[i]}".wjit 2>&1) 2>> benchmark/wasmer_llvm/compile.time || true
+        (time "$WAVM" compile --enable simd --format=precompiled-wasm build/"$MODE"/"${NAME[i]}".wasm benchmark/wavm/"${NAME[i]}".wasm 2>&1) 2>> benchmark/wavm/compile.time || true
+        (time wasmer compile --enable-simd --singlepass build/"$MODE"/"${NAME[i]}".wasm -o benchmark/wasmer_singlepass/"${NAME[i]}".wjit 2>&1) 2>> benchmark/wasmer_singlepass/compile.time || true
+        (time wasmer compile --enable-simd --cranelift build/"$MODE"/"${NAME[i]}".wasm -o benchmark/wasmer_cranelift/"${NAME[i]}".wjit 2>&1) 2>> benchmark/wasmer_cranelift/compile.time || true
+        (time wasmer compile --enable-simd --llvm build/"$MODE"/"${NAME[i]}".wasm -o benchmark/wasmer_llvm/"${NAME[i]}".wjit 2>&1) 2>> benchmark/wasmer_llvm/compile.time || true
     done
 }
 

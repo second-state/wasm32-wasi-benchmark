@@ -130,7 +130,7 @@ function sed_wasm_module() {
     for i in build/wasm/*.wasm; do
         wasm-dis "$i" -o "$i".wat
         sed -i -e 's@"env" "__wasi_@"wasi_snapshot_preview1" "@' "$i".wat
-        wasm-as --detect-features --enable-sign-ext --enable-mutable-globals --enable-nontrapping-float-to-int "$i".wat -g -o "$i"
+        wasm-as --detect-features --enable-sign-ext --enable-mutable-globals --enable-nontrapping-float-to-int --enable-simd "$i".wat -g -o "$i"
         rm "$i".wat
     done
 }
@@ -138,7 +138,7 @@ function sed_wasm_module() {
 function run_wasm_opt() {
     for i in build/wasm/*.wasm; do
         mv "$i" "$i".orig
-        wasm-opt --detect-features --enable-sign-ext --enable-mutable-globals --enable-nontrapping-float-to-int -g -O3 "$i".orig -o "$i"
+        wasm-opt --detect-features --enable-sign-ext --enable-mutable-globals --enable-nontrapping-float-to-int --enable-simd -g -O3 "$i".orig -o "$i"
     done
 }
 
