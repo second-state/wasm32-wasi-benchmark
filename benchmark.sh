@@ -199,7 +199,7 @@ function print_result() {
     #for type in ssvm; do
         echo -n "$type"
         for name in "${NAME[@]}"; do
-            echo -n ,"$(awk '{total+=$0;++count}END{print total/count}' benchmark/"$type"/"$name".log)"
+            echo -n ,"$(awk 'function abs(x){return ((x < 0.0) ? -x : x)} {sum+=$0; sumsq+=($0)^2} END {mean = sum / NR; error = sqrt(abs(sumsq / NR - mean^2)); printf("%.3f(%.3f)", mean, error)}' benchmark/"$type"/"$name".log)"
         done
         echo
     done
