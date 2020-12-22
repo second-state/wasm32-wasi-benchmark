@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 MODE=wasm
-SSVMC=thirdparty/ssvm/build/tools/ssvm-aot/ssvmc
-SSVMR=thirdparty/ssvm/build/tools/ssvm-aot/ssvmr
+SSVMC=thirdparty/ssvm/build/tools/ssvm/ssvmc
+SSVM=thirdparty/ssvm/build/tools/ssvm/ssvm
 LUCETC=thirdparty/lucet/target/release/lucetc
 LUCET_WASI=thirdparty/lucet/target/release/lucet-wasi
 LUCET_BINDINGS=thirdparty/lucet/lucet-wasi/bindings.json
@@ -81,9 +81,9 @@ function benchmark_ssvm() {
         rm -f "$LOG"
         touch "$LOG"
         for ((j=0; j<$COUNT; ++j)); do
-            time "$SSVMR" --enable-simd benchmark/ssvm/"${NAME[i]}".so "${ARGS[i]}" <benchmark/random >&/dev/null
+            time "$SSVM" --enable-simd benchmark/ssvm/"${NAME[i]}".so "${ARGS[i]}" <benchmark/random >&/dev/null
         done 2> "$LOG"
-        /usr/bin/time -o "benchmark/ssvm/"${NAME[i]}".time" --verbose "$SSVMR" --enable-simd benchmark/ssvm/"${NAME[i]}".so "${ARGS[i]}" <benchmark/random >&/dev/null
+        /usr/bin/time -o "benchmark/ssvm/"${NAME[i]}".time" --verbose "$SSVM" --enable-simd benchmark/ssvm/"${NAME[i]}".so "${ARGS[i]}" <benchmark/random >&/dev/null
     done
 }
 
@@ -203,7 +203,7 @@ function print_result() {
             echo -n ,"$(awk 'function abs(x){return ((x < 0.0) ? -x : x)} {sum+=$0; sumsq+=($0)^2} END {mean = sum / NR; error = sqrt(abs(sumsq / NR - mean^2)); printf("%.3f(%.3f)", mean, error)}' benchmark/"$type"/"$name".log)"
         done
         echo
-    done
+    done | tee result.csv
 }
 
 prepare

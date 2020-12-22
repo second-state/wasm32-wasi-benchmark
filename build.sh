@@ -84,7 +84,7 @@ function prepare_ssvm() {
         make build
         popd
     else
-        git clone --depth 1 --branch beststeve/simd https://github.com/second-state/SSVM.git thirdparty/ssvm
+        git clone --depth 1 https://github.com/second-state/SSVM.git thirdparty/ssvm
         pushd thirdparty/ssvm
         git submodule update --init --recursive
         mkdir build
