@@ -118,11 +118,11 @@ int ftruncate(int, off_t);
 int access(const char *, int);
 int faccessat(int, const char *, int, int);
 
-#ifdef __wasilibc_unmodified_upstream /* WASI has no cwd */
-int chdir(const char *);
+#ifdef __wasilibc_unmodified_upstream /* WASI has no fchdir */
 int fchdir(int);
-char *getcwd(char *, size_t);
 #endif
+int chdir(const char *);
+char *getcwd(char *, size_t);
 
 #ifdef __wasilibc_unmodified_upstream /* WASI has no signals */
 unsigned alarm(unsigned);
@@ -134,6 +134,7 @@ int pause(void);
 
 #ifdef __wasilibc_unmodified_upstream /* WASI has no fork/exec */
 pid_t fork(void);
+pid_t _Fork(void);
 int execve(const char *, char *const [], char *const []);
 int execv(const char *, char *const []);
 int execle(const char *, const char *, ...);
@@ -144,8 +145,17 @@ int fexecve(int, char *const [], char *const []);
 #endif
 _Noreturn void _exit(int);
 
-#ifdef __wasilibc_unmodified_upstream /* WASI has no getpid etc. */
+#if defined(__wasilibc_unmodified_upstream) || defined(_WASI_EMULATED_GETPID)
 pid_t getpid(void);
+#else
+__attribute__((__deprecated__(
+"WASI lacks process identifiers; to enable emulation of the `getpid` function using "
+"a placeholder value, which doesn't reflect the host PID of the program, "
+"compile with -D_WASI_EMULATED_GETPID and link with -lwasi-emulated-getpid"
+)))
+pid_t getpid(void);
+#endif
+#ifdef __wasilibc_unmodified_upstream /* WASI has no getpid etc. */
 pid_t getppid(void);
 pid_t getpgrp(void);
 pid_t getpgid(pid_t);
@@ -268,6 +278,7 @@ int syncfs(int);
 int euidaccess(const char *, int);
 int eaccess(const char *, int);
 ssize_t copy_file_range(int, off_t *, int, off_t *, size_t, unsigned);
+pid_t gettid(void);
 #endif
 #endif
 
