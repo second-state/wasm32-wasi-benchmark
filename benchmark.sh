@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 MODE=wasm
-SSVMC=thirdparty/ssvm/build/tools/ssvm/ssvmc
-SSVM=thirdparty/ssvm/build/tools/ssvm/ssvm
+WASMEDGEC=thirdparty/wasmedge/build/tools/wasmedge/wasmedgec
+WASMEDGE=thirdparty/wasmedge/build/tools/wasmedge/wasmedge
 LUCETC=thirdparty/lucet/target/release/lucetc
 LUCET_WASI=thirdparty/lucet/target/release/lucet-wasi
 LUCET_BINDINGS=thirdparty/lucet/lucet-wasi/bindings.json
 WAVM=thirdparty/wavm/build/bin/wavm
 export WAVM_OBJECT_CACHE_DIR=benchmark/wavm/cache
 TIMEFORMAT=%4R
-COUNT=20
+COUNT=5
 
 NAME=(
     nop
@@ -34,9 +34,23 @@ ARGS=(
     25000000
 )
 
+#for interpreter
+#ARGS=(
+#    0
+#    0
+#    500000
+#    500000
+#    9
+#    1000
+#    1000
+#    12
+#    250000
+#)
+
 function prepare() {
     mkdir -p benchmark/native
-    mkdir -p benchmark/ssvm
+    # mkdir -p benchmark/wasmedge_interpreter
+    mkdir -p benchmark/wasmedge
     mkdir -p benchmark/lucet
     mkdir -p benchmark/wavm
     mkdir -p benchmark/wasmer_singlepass
@@ -50,9 +64,9 @@ function prepare() {
 }
 
 function compile() {
-    rm -f benchmark/ssvm/compile.time benchmark/lucet/compile.time benchmark/wavm/compile.time benchmark/wasmer_*/compile.time
+    rm -f benchmark/wasmedge/compile.time benchmark/lucet/compile.time benchmark/wavm/compile.time benchmark/wasmer_*/compile.time
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
-        (time "$SSVMC" --enable-simd build/"$MODE"/"${NAME[i]}".wasm benchmark/ssvm/"${NAME[i]}".so 2>&1) 2>> benchmark/ssvm/compile.time || true
+        (time "$WASMEDGEC" --enable-simd build/"$MODE"/"${NAME[i]}".wasm benchmark/wasmedge/"${NAME[i]}".so 2>&1) 2>> benchmark/wasmedge/compile.time || true
         (time "$LUCETC" build/"$MODE"/"${NAME[i]}".wasm --wasi_exe --opt-level speed --bindings "$LUCET_BINDINGS" -o benchmark/lucet/"${NAME[i]}".so 2>&1) 2>> benchmark/lucet/compile.time || true
         (time "$WAVM" compile --enable simd --format=precompiled-wasm build/"$MODE"/"${NAME[i]}".wasm benchmark/wavm/"${NAME[i]}".wasm 2>&1) 2>> benchmark/wavm/compile.time || true
         (time wasmer compile --enable-simd --singlepass build/"$MODE"/"${NAME[i]}".wasm -o benchmark/wasmer_singlepass/"${NAME[i]}".wjit 2>&1) 2>> benchmark/wasmer_singlepass/compile.time || true
@@ -74,16 +88,29 @@ function benchmark_native() {
     done
 }
 
-function benchmark_ssvm() {
-    echo benchmark_ssvm
+function benchmark_wasmedge_interpreter() {
+    echo benchmark_wasmedge_interpreter
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
-        LOG="benchmark/ssvm/"${NAME[i]}".log"
+        LOG="benchmark/wasmedge_interpreter/"${NAME[i]}".log"
         rm -f "$LOG"
         touch "$LOG"
         for ((j=0; j<$COUNT; ++j)); do
-            time "$SSVM" --enable-simd benchmark/ssvm/"${NAME[i]}".so "${ARGS[i]}" <benchmark/random >&/dev/null
+            time "$WASMEDGE" --enable-simd build/"$MODE"/"${NAME[i]}".wasm "${ARGS[i]}" <benchmark/random >&/dev/null
         done 2> "$LOG"
-        /usr/bin/time -o "benchmark/ssvm/"${NAME[i]}".time" --verbose "$SSVM" --enable-simd benchmark/ssvm/"${NAME[i]}".so "${ARGS[i]}" <benchmark/random >&/dev/null
+        /usr/bin/time -o "benchmark/wasmedge_interpreter/"${NAME[i]}".time" --verbose "$WASMEDGE" --enable-simd build/"$MODE"/"${NAME[i]}".wasm "${ARGS[i]}" <benchmark/random >&/dev/null
+    done
+}
+
+function benchmark_wasmedge() {
+    echo benchmark_wasmedge
+    for ((i=0; i<"${#NAME[@]}"; ++i)); do
+        LOG="benchmark/wasmedge/"${NAME[i]}".log"
+        rm -f "$LOG"
+        touch "$LOG"
+        for ((j=0; j<$COUNT; ++j)); do
+            time "$WASMEDGE" --enable-simd benchmark/wasmedge/"${NAME[i]}".so "${ARGS[i]}" <benchmark/random >&/dev/null
+        done 2> "$LOG"
+        /usr/bin/time -o "benchmark/wasmedge/"${NAME[i]}".time" --verbose "$WASMEDGE" --enable-simd benchmark/wasmedge/"${NAME[i]}".so "${ARGS[i]}" <benchmark/random >&/dev/null
     done
 }
 
@@ -168,13 +195,14 @@ function benchmark_wasmer_jit() {
 function benchmark_v8() {
     echo benchmark_v8
     for ((i=0; i<"${#NAME[@]}"; ++i)); do
+        echo node --experimental-wasi-unstable-preview1 --experimental-wasm-simd v8/index.js build/"$MODE"/"${NAME[i]}".wasm "${ARGS[i]}"
         LOG="benchmark/v8/"${NAME[i]}".log"
         rm -f "$LOG"
         touch "$LOG"
         for ((j=0; j<$COUNT; ++j)); do
-            time nodejs --experimental-wasi-unstable-preview1 --experimental-wasm-bigint v8/index.js build/"$MODE"/"${NAME[i]}".wasm "${ARGS[i]}" <benchmark/random >&/dev/null
+            time node --experimental-wasi-unstable-preview1 --experimental-wasm-simd v8/index.js build/"$MODE"/"${NAME[i]}".wasm "${ARGS[i]}" <benchmark/random >&/dev/null
         done 2> "$LOG"
-        /usr/bin/time -o "benchmark/v8/"${NAME[i]}".time" --verbose nodejs --experimental-wasi-unstable-preview1 --experimental-wasm-bigint v8/index.js build/"$MODE"/"${NAME[i]}".wasm "${ARGS[i]}" <benchmark/random >&/dev/null
+        /usr/bin/time -o "benchmark/v8/"${NAME[i]}".time" --verbose node --experimental-wasi-unstable-preview1 --experimental-wasm-simd v8/index.js build/"$MODE"/"${NAME[i]}".wasm "${ARGS[i]}" <benchmark/random >&/dev/null
     done
 }
 
@@ -196,8 +224,8 @@ function print_result() {
         echo -n ,"$name"
     done
     echo
-    for type in native ssvm lucet wavm wasmer_singlepass wasmer_cranelift wasmer_llvm wasmer_jit v8 docker; do
-    #for type in ssvm; do
+    # for type in native wasmedge_interpreter wasmedge lucet wavm wasmer_singlepass wasmer_cranelift wasmer_llvm wasmer_jit v8 docker; do
+    for type in native wasmedge lucet wavm wasmer_singlepass wasmer_cranelift wasmer_llvm wasmer_jit v8; do
         echo -n "$type"
         for name in "${NAME[@]}"; do
             echo -n ,"$(awk 'function abs(x){return ((x < 0.0) ? -x : x)} {sum+=$0; sumsq+=($0)^2} END {mean = sum / NR; error = sqrt(abs(sumsq / NR - mean^2)); printf("%.3f(%.3f)", mean, error)}' benchmark/"$type"/"$name".log)"
@@ -209,7 +237,7 @@ function print_result() {
 prepare
 compile
 benchmark_native
-benchmark_ssvm
+benchmark_wasmedge
 benchmark_lucet
 benchmark_wavm
 benchmark_wasmer_singlepass
@@ -217,5 +245,6 @@ benchmark_wasmer_cranelift
 benchmark_wasmer_llvm
 benchmark_wasmer_jit
 benchmark_v8
-benchmark_docker
+#benchmark_wasmedge_interpreter
+#benchmark_docker
 print_result

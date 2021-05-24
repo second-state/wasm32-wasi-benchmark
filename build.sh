@@ -10,12 +10,12 @@ function check_cmake() {
 }
 
 function check_clang() {
-    if ! clang-10 --version >/dev/null; then
-        echo "clang-10 required!"
+    if ! clang-11 --version >/dev/null; then
+        echo "clang-11 required!"
         exit 1
     fi
-    if ! clang++-10 --version >/dev/null; then
-        echo "clang++-10 required!"
+    if ! clang++-11 --version >/dev/null; then
+        echo "clang++-11 required!"
         exit 1
     fi
 }
@@ -75,23 +75,23 @@ function prepare_lucet() {
     fi
 }
 
-function prepare_ssvm() {
-    if [ -e thirdparty/ssvm/.git ]; then
-        pushd thirdparty/ssvm
+function prepare_wasmedge() {
+    if [ -e thirdparty/wasmedge/.git ]; then
+        pushd thirdparty/wasmedge
         git fetch -a
         git reset --hard origin/HEAD
         git submodule update --init --recursive
-        make build
+        make -C build
         popd
     else
-        git clone --depth 1 https://github.com/second-state/SSVM.git thirdparty/ssvm
-        pushd thirdparty/ssvm
+        git clone --depth 1 https://github.com/WasmEdge/WasmEdge.git thirdparty/wasmedge
+        pushd thirdparty/wasmedge
         git submodule update --init --recursive
         mkdir build
         cd build
         cmake .. -DCMAKE_BUILD_TYPE=Release
-        make
         cd ..
+        make -C build -j 8
         popd
     fi
 }
@@ -122,11 +122,12 @@ function apply_emcc() {
 }
 
 function invoke_cmake() {
-    CC=clang-10 CXX=clang++-10 cmake -B build . -DCMAKE_BUILD_TYPE=Release
+    CC=clang-11 CXX=clang++-11 cmake -B build . -DCMAKE_BUILD_TYPE=Release
     cmake --build build
 }
 
 function sed_wasm_module() {
+    return
     for i in build/wasm/*.wasm; do
         wasm-dis "$i" -o "$i".wat
         sed -i -e 's@"env" "__wasi_@"wasi_snapshot_preview1" "@' "$i".wat
@@ -136,6 +137,7 @@ function sed_wasm_module() {
 }
 
 function run_wasm_opt() {
+    return
     for i in build/wasm/*.wasm; do
         mv "$i" "$i".orig
         wasm-opt --detect-features --enable-sign-ext --enable-mutable-globals --enable-nontrapping-float-to-int --enable-simd -g -O3 "$i".orig -o "$i"
@@ -165,7 +167,7 @@ check_wasmer
 prepare_lucet
 prepare_emcc
 prepare_wavm
-prepare_ssvm
+prepare_wasmedge
 
 apply_emcc
 invoke_cmake
